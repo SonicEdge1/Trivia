@@ -38,7 +38,8 @@ def create_app(test_config=None):
   # this wasn't discussed in the lessons.  Need to find documentation on what this does.  Don't understand what the todo is instructing.
   # https://flask-cors.corydolphin.com/en/latest/api.html#extension
   # https://flask-cors.readthedocs.io/en/latest/
-  CORS(app) # I'm hoping this is what the todo referred to.
+  CORS(app, origin='*')
+  # I'm hoping this is what the todo referred to.
   '''
   @TODO: Use the after_request decorator to set Access-Control-Allow
   '''
