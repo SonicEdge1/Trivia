@@ -4,14 +4,11 @@ export FLASK_ENV=development
 flask run
 '''
 
-#how would you write an aPI to return different error codes when the try catch method catches all aborts???
 import os
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
-
-from sqlalchemy.sql.expression import null
 
 from models import setup_db, Question, Category
 
@@ -32,17 +29,9 @@ def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
   setup_db(app)
-  '''
-  @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
-  '''
-  # this wasn't discussed in the lessons.  Need to find documentation on what this does.  Don't understand what the todo is instructing.
-  # https://flask-cors.corydolphin.com/en/latest/api.html#extension
+  # https://flask-cors.corydolphin.com/en/latest/api.html#extension //future reference for configuration
   # https://flask-cors.readthedocs.io/en/latest/
   CORS(app, origin='*')
-  # I'm hoping this is what the todo referred to.
-  '''
-  @TODO: Use the after_request decorator to set Access-Control-Allow
-  '''
   # CORS Headers 
   @app.after_request
   def after_request(response):
@@ -97,27 +86,13 @@ def create_app(test_config=None):
   reference FormView.js : 20, and QuizView.js : 25
   '''
 
-  '''
-  @TODO: DONE
-  Create an endpoint to handle GET requests for questions, 
-  including pagination (every 10 questions). 
-  This endpoint should return a list of questions, 
-  number of total questions, current category, categories. 
-  QuestionView.js : 26
 
-  TEST: At this point, when you start the application
-  you should see questions and categories generated,
-  ten questions per page and pagination at the bottom of the screen for three pages.
-  Clicking on the page numbers should update the questions. 
-  '''
   @app.route('/questions')
   def get_questions():
+    '''endpoint to handle GET requests for all available questions'''
     all_questions = Question.query.order_by(Question.id).all()
     paginated_questions = paginate_questions(request, all_questions)
     formatted_categories = get_formatted_categories()
-
-    # if len(paginated_questions) == 0:
-    #   abort(RESOURCE_NOT_FOUND)
     return jsonify({
       'success':True,
       'questions': paginated_questions,
@@ -125,17 +100,16 @@ def create_app(test_config=None):
       'categories': formatted_categories,
       'current_category': current_category
     })
-
-
   '''
-  @TODO: DONE
-  Create an endpoint to DELETE question using a question ID. 
-
-  TEST: When you click the trash icon next to a question, the question will be removed.
-  This removal will persist in the database and when you refresh the page. 
+  test using:
+  curl http://127.0.0.1:5000/questions
+  reference QuestionView.js : 26
   '''
+
+
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question_by_id(question_id):
+    '''endpoint to DELETE a question using a question ID'''
     try:
       question = Question.query.get(question_id)
       question_text = question.question
@@ -147,36 +121,16 @@ def create_app(test_config=None):
       })
     except:
       abort(UNPROCESSABLE_ENTITY)
-
-
   '''
-  @TODO: DONE
-  Create an endpoint to POST a new question, 
-  which will require the question and answer text, 
-  category, and difficulty score.
-
-  TEST: When you submit a question on the "Add" tab, 
-  the form will clear and the question will appear at the end of the last page
-  of the questions list in the "List" tab.  
+  test using:
+  curl -X DELETE http://127.0.0.1:5000/questions/5
+  reference QuestionView.js : 108
   '''
 
-  '''
-  @TODO: DONE
-  Create a POST endpoint to get questions based on a search term. 
-  It should return any questions for whom the search term 
-  is a substring of the question. 
 
-  TEST: Search by any phrase. The questions list will update to include 
-  only question that include that string within their question. 
-  Try using the word "title" to start. 
-  '''
-  ### are search and add going to be the same url ? YES!
-  #search QuestionView.js : 81
-  #add FormView.js : 37
-  # curl -X POST -H "Content-Type: application/json" -d '{"question":"How many different actors have portrayed the character James Bond in the 26 films released between 1962-2015?", "answer":"Seven", "difficulty":"4", "category":"5"}' http://127.0.0.1:5000/questions
-  # curl -X POST -H "Content-Type: application/json" -d '{"searchTerm":"soccer"}' http://127.0.0.1:5000/questions
   @app.route('/questions', methods=['POST'])
   def search_question_by_string_or_add_question():
+    '''a POST endpoint to either get questions based on a search term or create a new question'''
     try:
       body = request.get_json()
       searchTerm = body.get('searchTerm')
@@ -189,9 +143,8 @@ def create_app(test_config=None):
           'success': True,
           'questions': paginated_questions,
           'total_questions': count,
-          'current_category': 1  ##where is this supposed to come from ?
+          'current_category': current_category
         })
-
       # if not a search, then try to add a new question
       else:
         new_question = Question(
@@ -200,6 +153,7 @@ def create_app(test_config=None):
           difficulty=body.get('difficulty', None),
           category=body.get('category', None)
         )
+        # don't add duplicate questions
         duplicate_question = Question.query.filter_by(question=body.get('question')).one_or_none()
         if (duplicate_question):
           return jsonify({
@@ -219,17 +173,17 @@ def create_app(test_config=None):
 
     except:
       abort(UNPROCESSABLE_ENTITY)
-
   '''
-  @TODO: DONE
-  Create a GET endpoint to get questions based on category. 
-
-  TEST: In the "List" tab / main screen, clicking on one of the 
-  categories in the left column will cause only questions of that 
-  category to be shown. 
+  test using:
+  curl -X POST -H "Content-Type: application/json" -d '{"searchTerm":"soccer"}' http://127.0.0.1:5000/questions
+  curl -X POST -H "Content-Type: application/json" -d '{"question":"How many different actors have portrayed the character James Bond in the 26 films released between 1962-2015?", "answer":"Seven", "difficulty":"4", "category":"5"}' http://127.0.0.1:5000/questions
+  references  QuestionView.js : 81  &  FormView.js : 37
   '''
+
+
   @app.route('/categories/<int:category_id>/questions', methods=['GET'])
   def get_questions_of_category(category_id):
+    '''a GET endpoint to get questions based on category'''
     try:
       question_selection = Question.query.filter_by(category = f'{category_id}').order_by(Question.id).all()
       paginated_questions = paginate_questions(request, question_selection)
@@ -243,33 +197,26 @@ def create_app(test_config=None):
         'current_category': current_category
      })
     except:
-      abort(UNPROCESSABLE_ENTITY)  
-
+      abort(UNPROCESSABLE_ENTITY)
   '''
-  @TODO: 
-  Create a POST endpoint to get questions to play the quiz. 
-  This endpoint should take category and previous question parameters 
-  and return a random questions within the given category, 
-  if provided, and that is not one of the previous questions. 
-  QuizView.js : 51
-
-  TEST: In the "Play" tab, after a user selects "All" or a category,
-  one question at a time is displayed, the user is allowed to answer
-  and shown whether they were correct or not. 
-  curl -X POST -H "Content-Type: application/json" -d '{"previous_questions":"[1, 4, 20, 15]", "quiz_category":"Sports"}' http://127.0.0.1:5000/quizzes
+  test using:
+  curl http://127.0.0.1:5000/categories/5/questions
+  reference QuestionView.js : 63
   '''
-  
-  # def get_random_question_in_category(quiz_category):
-  #   question_selection = Question.query.filter_by(category = f'{quiz_category}').order_by(Question.id).all()
-  #   paginated_questions = paginate_questions(request, question_selection)
-  #   num_questions = len(paginated_questions)
-  #   rand_num = random.randint(0, num_questions - 1)
-  #   print("*** Random Number:", rand_num)
-  #   return paginated_questions[0]  
+
 
   def get_random_question(question_selection, previous_questions):
+    '''
+    Returns a random, previously unchosen question from a given selection
+        Parameters:
+                 question_selection: a list of questions to choose from
+                 previous_questions: a list of previously asked question id's
+
+        Returns:
+                formatted_questions: One formatted trivia question
+    '''
     formatted_questions = [question.format() for question in question_selection]
-    # single_question = Question.query.filter(Question.id.notin_(previous_questions)).all()
+    # single_question = Question.query.filter(Question.id.notin_(previous_questions)).all() //may want to refactor using similar query
     num_questions = len(formatted_questions)
     rand_num = -1
     unique_question = False
@@ -279,23 +226,32 @@ def create_app(test_config=None):
         unique_question = True
     return formatted_questions[rand_num]  
 
+
   def get_question_selection_from_category(quiz_category):
+    '''
+    Returns a selection of trivia questions given a quiz category
+        Parameters:
+                 quiz_category: the desired quiz category
+
+        Returns:
+                question_selection: a list of questions from the given category or all questions if category id is 0
+    '''
     category_id = quiz_category["id"]
-    question_selection = []
     if category_id == 0:
       question_selection = Question.query.all()
     else:
       question_selection = Question.query.filter_by(category = f'{category_id}').all()
     return question_selection
 
+
   @app.route('/quizzes', methods=['POST'])
   def get_new_quiz_question():
+    '''a POST endpoint to get questions to play the quiz'''
     try:
       min_num_of_questions = 6
       body = request.get_json()
       previous_questions = body.get('previous_questions')
       quiz_category = body.get('quiz_category')
-
       question_selection = get_question_selection_from_category(quiz_category)
       # conditional prevents an infinite loop of searching when less than min_num_of_questions exists
       if len(question_selection) < min_num_of_questions:
@@ -313,14 +269,16 @@ def create_app(test_config=None):
         'total_questions': 1
       }), OK
     except:
-      abort(RESOURCE_NOT_FOUND)
-
+      abort(UNPROCESSABLE_ENTITY)
+  '''
+  test using:
+  curl -X POST -H "Content-Type: application/json" -d '{"previous_questions":[20, 21, 22, 27, 28], "quiz_category":{"type": "Science", "id": "1"}}' http://127.0.0.1:5000/quizzes
+  reference QuizView.js : 51
+  '''
 
 
   '''
-  @TODO: 
-  Create error handlers for all expected errors 
-  including 404 and 422. 
+  Error Handlers
   '''
   @app.errorhandler(BAD_REQUEST)
   def bad_request(error):
@@ -354,5 +312,3 @@ def create_app(test_config=None):
           "message": UNPROCESSABLE_ENTITY_MSG,
           }), UNPROCESSABLE_ENTITY
   return app
-
-    

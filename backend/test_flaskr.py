@@ -18,6 +18,7 @@ UNPROCESSABLE_ENTITY = 422
 UNPROCESSABLE_ENTITY_MSG = "Unprocessable Entity"
 TEST_QUESTION_TEXT = 'How many different actors have portrayed the character James Bond in the 26 films released between 1962-2015'
 DUPLICATE_TEXT = "What is the largest lake in Africa?"
+DELETE_QUESTION_TEST = "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
 
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
@@ -27,7 +28,6 @@ class TriviaTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client
         self.database_name = "trivia_test"
-        # self.database_path = "postgres://{}/{}".format('localhost:5432', self.database_name)
         self.database_path = "postgresql://{}:{}@{}/{}".format('student', 'student','localhost:5432', self.database_name)
 
         setup_db(self.app, self.database_path)
@@ -78,7 +78,6 @@ class TriviaTestCase(unittest.TestCase):
         questions_in_category = 6
         res = self.client().get(f'/categories/{category_id}/questions')
         data = json.loads(res.data)
-        # print("DATA: ", data)
         self.assertEqual(res.status_code, OK)
         self.assertEqual(data['success'], True)
         self.assertEqual(data['current_category'], category_name)
@@ -89,7 +88,7 @@ class TriviaTestCase(unittest.TestCase):
     def test_success_delete_question_by_id(self):
         """Test success at DELETE '/questions/<int:question_id>"""
         question_id = 2
-        question_text = "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+        question_text = DELETE_QUESTION_TEST
         question = Question.query.get(question_id)
         res = self.client().delete(f'/questions/{question_id}')
         removed_question = Question.query.filter_by(id = question_id).one_or_none()
