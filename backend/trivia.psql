@@ -124,11 +124,11 @@ COPY public.categories (id, type) FROM stdin;
 --
 
 COPY public.questions (id, question, answer, difficulty, category) FROM stdin;
-5	Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?	Maya Angelou	2	4
-9	What boxer's original name is Cassius Clay?	Muhammad Ali	1	4
 2	What movie earned Tom Hanks his third straight Oscar nomination, in 1996?	Apollo 13	4	5
+5	Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?	Maya Angelou	2	4
 4	What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?	Tom Cruise	4	5
 6	What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?	Edward Scissorhands	3	5
+9	What boxer's original name is Cassius Clay?	Muhammad Ali	1	4
 10	Which is the only team to play in every soccer World Cup tournament?	Brazil	3	6
 11	Which country won the first ever soccer World Cup in 1930?	Uruguay	4	6
 12	Who invented Peanut Butter?	George Washington Carver	2	4
@@ -143,6 +143,23 @@ COPY public.questions (id, question, answer, difficulty, category) FROM stdin;
 21	Who discovered penicillin?	Alexander Fleming	3	1
 22	Hematology is a branch of medicine involving the study of what?	Blood	4	1
 23	Which dung beetle was worshipped by the ancient Egyptians?	Scarab	4	4
+24	What movie trilogy centers around history altering events occurring on November 12, 1955?	Back to the Future	1	5
+25	What color is Darth Vader's Lightsaber?	Red	1	5
+26	Where can you find the answer to how many roads a man must walk down before they call him a man?	blowin in the wind	1	5
+27	What is the most abundant, naturally occurring gas?	Nitrogen	1	1
+28	What is the most abundant element on Earth?	Oxygen	1	1
+29	What branch of science studies ancient life on Earth?	Paleontology	2	1
+30	In what year was the Declaration of Independence signed?	1776	1	4
+31	In what year did the United States enter World War 2 due to the December 7th Japanese attack on Peal Harbor?	1941	1	4
+32	What is the alternate name for the Battle of Little Bighorn?	Custer's Last Stand	3	4
+33	In what famous city is there a 1/4 scale replica of the Statue of Liberty that faces towards its larger sibling in New York City?	Paris	2	3
+34	The Suez Canal is located in what country?	Egypt	2	3
+35	Which African nation has the most pyramids?	Sudan	4	3
+36	Which Country has the most coastline in the world?	Canada	4	3
+37	What is the only sea on Earth without any coasts?	Sargasso	5	3
+38	What large bronze sculpture by Auguste Rodin was originally named "The Poet"?	The Thinker	3	2
+39	The Mona Lisa was painted by what famous artist?	Leonardo da Vinci	1	2
+40	What famous painting was created by Vincent van Gogh whle he was committed in an asylum in 1889?	The Starry Night	3	2
 \.
 
 

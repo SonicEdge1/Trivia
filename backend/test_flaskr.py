@@ -36,14 +36,14 @@ class TriviaTestCase(unittest.TestCase):
             'question': TEST_QUESTION_TEXT,
             'answer': 'Seven',
             'difficulty': 4,
-            'category': 5
+            'category': '5'
         }
 
         self.duplicate_question = {
             'question': DUPLICATE_TEXT,
             'answer': 'Lake Victoria',
             'difficulty': 2,
-            'category': 3
+            'category': "3"
         }
 
 
@@ -75,14 +75,14 @@ class TriviaTestCase(unittest.TestCase):
         """Test success at GET '/categories/<int:category_id>/questions'"""
         category_id = 1
         category_name = "Science"
-        books_in_category = 3
+        questions_in_category = 6
         res = self.client().get(f'/categories/{category_id}/questions')
         data = json.loads(res.data)
         # print("DATA: ", data)
         self.assertEqual(res.status_code, OK)
         self.assertEqual(data['success'], True)
         self.assertEqual(data['current_category'], category_name)
-        self.assertEqual(data['total_questions'], books_in_category)
+        self.assertEqual(data['total_questions'], questions_in_category)
         self.assertTrue(data['questions'])
 
 
@@ -106,12 +106,12 @@ class TriviaTestCase(unittest.TestCase):
     def test_success_search_question_by_string(self):
         """Test success at POST '/questions' with json searchTerm"""
         term = "soccer"
-        num_books_with_term = 2
+        num_questions_with_term = 2
         res = self.client().post('/questions', json={'searchTerm': f'{term}'})
         data = json.loads(res.data)
         self.assertEqual(res.status_code, OK)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['total_questions'], num_books_with_term)
+        self.assertEqual(data['total_questions'], num_questions_with_term)
         self.assertTrue(data['questions'])
         self.assertTrue(data['current_category'])
 
@@ -141,9 +141,9 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_success_qet_quiz_question(self):
         """Test success at POST '/quizzes' with json providing category and previous question list"""
-        quiz_category = {"type": "Sports", "id": "6"}
-        previous_questions = [10]
-        remaining_question_id = 11
+        quiz_category = {"type": "Science", "id": "1"}
+        previous_questions = [20, 21, 22, 27, 28]
+        remaining_question_id = 29
         res = self.client().post('/quizzes', json={'quiz_category': quiz_category, 'previous_questions' : previous_questions})
         data = json.loads(res.data)
         self.assertEqual(res.status_code, OK)

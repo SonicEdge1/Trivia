@@ -235,9 +235,6 @@ def create_app(test_config=None):
       paginated_questions = paginate_questions(request, question_selection)
       category = Category.query.get(category_id)
       current_category = category.type
-      # print("*** QUESTIONS: ",paginated_questions )
-      # print("*** TOTAL Q'S: ",len(question_selection) )
-      # print("*** C_CATEGORY: ",current_category)
 
       return jsonify({
         'success':True,
