@@ -53,9 +53,23 @@ def create_app(test_config=None):
     page = request.args.get('page', 1, type=int)
     start = (page -1) * QUESTIONS_PER_PAGE
     end = start + QUESTIONS_PER_PAGE
-    formatted_questions = [question.format() for question in question_selection]
+    formatted_questions = format_questions(question_selection)
     return formatted_questions[start:end]
   
+
+  def format_questions(question_selection):
+    '''
+    Returns a fomatted selection of trivia questions
+        Parameters:
+                 question_selection: a selection of questions from the trivia question db
+
+        Returns:
+                formatted_questions: An array of formated trivia questions
+    '''
+    formatted_questions = [question.format() for question in question_selection]
+    return formatted_questions
+
+
   def get_formatted_categories():
     '''
     Returns a dictionary of all trivia game categories
@@ -65,6 +79,7 @@ def create_app(test_config=None):
     for category in all_categories:
       formatted_categories.update({f'{category.id}' : f'{category.type}'})
     return formatted_categories
+
 
   @app.route('/categories')
   def get_categories():
@@ -116,8 +131,8 @@ def create_app(test_config=None):
       question.delete()
       return jsonify({
       'success':True,
-      'question': question_text,
-      'question_id': question_id
+      'deleted_question_text': question_text,
+      'deleted_question_id': question_id
       })
     except:
       abort(UNPROCESSABLE_ENTITY)
@@ -129,7 +144,7 @@ def create_app(test_config=None):
 
 
   @app.route('/questions', methods=['POST'])
-  def search_question_by_string_or_add_question():
+  def search_questions_by_string_or_add_question():
     '''a POST endpoint to either get questions based on a search term or create a new question'''
     try:
       body = request.get_json()
@@ -170,7 +185,6 @@ def create_app(test_config=None):
             'total_questions': len(Question.query.all()),
             'new_question_id': unique_question.id
           })
-
     except:
       abort(UNPROCESSABLE_ENTITY)
   '''
