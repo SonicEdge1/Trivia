@@ -16,7 +16,7 @@ METHOD_NOT_ALLOWED = 405
 METHOD_NOT_ALLOWED_MSG = "Method Not Allowed"
 UNPROCESSABLE_ENTITY = 422
 UNPROCESSABLE_ENTITY_MSG = "Unprocessable Entity"
-TEST_QUESTION_TEXT = 'How many different actors have portrayed the character James Bond in the 26 films released between 1962-2015'
+TEST_QUESTION_TEXT = "How many different actors have portrayed the character James Bond in the 26 films released between 1962-2015"
 DUPLICATE_TEXT = "What is the largest lake in Africa?"
 DELETE_QUESTION_TEST = "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
 
@@ -34,9 +34,9 @@ class TriviaTestCase(unittest.TestCase):
 
         self.new_question = {
             'question': TEST_QUESTION_TEXT,
-            'answer': 'Seven',
+            'answer': "Seven",
             'difficulty': 4,
-            'category': '5'
+            'category': "5"
         }
 
         self.duplicate_question = {
@@ -45,8 +45,6 @@ class TriviaTestCase(unittest.TestCase):
             'difficulty': 2,
             'category': "3"
         }
-
-
 
         # binds the app to the current context
         with self.app.app_context():
@@ -71,6 +69,83 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['categories'])
 
 
+    def test_fail_post_categories(self):
+        """Test fail a POST to '/categories'"""
+        res = self.client().post('/categories')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
+    def test_fail_put_categories(self):
+        """Test fail a PUT to '/categories'"""
+        res = self.client().put('/categories')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
+    def test_fail_patch_categories(self):
+        """Test fail a PATCH to '/categories'"""
+        res = self.client().patch('/categories')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
+    def test_fail_delete_categories(self):
+        """Test fail a DELETE to '/categories'"""
+        res = self.client().delete('/categories')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
+    def test_success_get_questions(self):
+        """Test success at GET '/questions'"""
+        category_name = "Science"
+        total_questions = 36
+        res = self.client().get('/questions')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, OK)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+        self.assertTrue(data['categories'])
+        self.assertEqual(data['current_category'], category_name)
+        self.assertEqual(data['total_questions'], total_questions)
+
+
+    def test_fail_delete_questions_at_base_question_url(self):
+        """Test fail DELETE at '/questions'"""
+        res = self.client().delete('/questions')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
+    def test_fail_put_questions(self):
+        """Test fail PUT at '/questions'"""
+        res = self.client().put('/questions')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
+    def test_fail_patch_questions(self):
+        """Test fail PATCH at '/questions'"""
+        res = self.client().patch('/questions')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
     def test_success_get_questions_of_category(self):
         """Test success at GET '/categories/<int:category_id>/questions'"""
         category_id = 1
@@ -83,6 +158,17 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['current_category'], category_name)
         self.assertEqual(data['total_questions'], questions_in_category)
         self.assertTrue(data['questions'])
+
+
+    def test_fail_get_questions_of_missing_category(self):
+        """Test fail at GET '/categories/<int:category_id>/questions' w category not in DB"""
+        category_id = 7
+        category_name = "Non-Existant"
+        res = self.client().get(f'/categories/{category_id}/questions')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, UNPROCESSABLE_ENTITY)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], UNPROCESSABLE_ENTITY_MSG)
 
 
     def test_success_delete_question_by_id(self):
@@ -102,6 +188,56 @@ class TriviaTestCase(unittest.TestCase):
         Question.insert(question)
 
 
+    def test_fail_delete_question_by_missing_id(self):
+        """Test success at DELETE '/questions/<int:question_id>' w non-existant ID"""
+        question_id = 200
+        res = self.client().delete(f'/questions/{question_id}')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, UNPROCESSABLE_ENTITY)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], UNPROCESSABLE_ENTITY_MSG)
+
+
+    def test_fail_post_question_by_id(self):
+        """Test fail at POST '/questions/<int:question_id>'"""
+        question_id = 200
+        res = self.client().post(f'/questions/{question_id}')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
+    def test_fail_get_question_by_id(self):
+        """Test fail at GET '/questions/<int:question_id>'"""
+        question_id = 200
+        res = self.client().get(f'/questions/{question_id}')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
+    def test_fail_put_question_by_id(self):
+        """Test fail at PUT '/questions/<int:question_id>'"""
+        question_id = 200
+        res = self.client().put(f'/questions/{question_id}')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
+    def test_fail_patch_question_by_id(self):
+        """Test fail at PATCH '/questions/<int:question_id>'"""
+        question_id = 200
+        res = self.client().patch(f'/questions/{question_id}')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
     def test_success_search_question_by_string(self):
         """Test success at POST '/questions' with json searchTerm"""
         term = "soccer"
@@ -113,6 +249,29 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['total_questions'], num_questions_with_term)
         self.assertTrue(data['questions'])
         self.assertTrue(data['current_category'])
+
+
+    def test_success_search_question_by_string_no_results(self):
+        """Test success at POST '/questions' with json searchTerm"""
+        term = "ignoramus"
+        num_questions_with_term = 0
+        res = self.client().post('/questions', json={'searchTerm': f'{term}'})
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, OK)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['total_questions'], num_questions_with_term)
+        self.assertEqual(data['questions'], [])
+        self.assertTrue(data['current_category'])
+
+
+    def test_fail_search_question_by_string_with_malformed_json(self):
+        """Test fail at POST '/questions' with bad json"""
+        term = "ignoramus"
+        res = self.client().post('/questions', json={'badJson': f'{term}'})
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, UNPROCESSABLE_ENTITY)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], UNPROCESSABLE_ENTITY_MSG)
 
 
     def test_success_add_question(self):
@@ -128,8 +287,17 @@ class TriviaTestCase(unittest.TestCase):
         self.client().delete(f'/questions/{new_id}')
 
 
-    def test_fail_to_add_duplicate_question(self):
-        """Test fail at POST '/questions' with json to add DUPLICATE question"""
+    def test_fail_add_question_missing_data(self):
+        """Test success at POST '/questions' missing json"""
+        res = self.client().post('/questions')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, UNPROCESSABLE_ENTITY)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], UNPROCESSABLE_ENTITY_MSG)
+
+
+    def test_success_wont_add_duplicate_question(self):
+        """Test success at POST '/questions' with json to add DUPLICATE question, no question added to DB"""
         res = self.client().post('/questions', json=self.duplicate_question)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, OK)
@@ -163,6 +331,60 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertEqual(data['question'], None)
         self.assertEqual(data['total_questions'], num_sports_questions)
+
+
+    def test_fail_qet_quiz_question_wout_json(self):
+        """Test fail at POST '/quizzes' without json"""
+        res = self.client().post('/quizzes')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, UNPROCESSABLE_ENTITY)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], UNPROCESSABLE_ENTITY_MSG)
+
+
+    def test_fail_qet_quiz_question_bad_url(self):
+        """Test fail at POST '/quizzes/1' no url"""
+        res = self.client().post('/quizzes/1')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, RESOURCE_NOT_FOUND)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], RESOURCE_NOT_FOUND_MSG)
+
+
+    def test_fail_GET_quiz_question_method(self):
+        """Test fail at GET '/quizzes'"""
+        res = self.client().get('/quizzes')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
+    def test_fail_patch_quiz_question(self):
+        """Test fail at PATCH '/quizzes'"""
+        res = self.client().patch('/quizzes')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
+    def test_fail_PUT_quiz_question(self):
+        """Test fail at PUT '/quizzes'"""
+        res = self.client().put('/quizzes')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
+
+
+    def test_fail_DELETE_quiz_question(self):
+        """Test fail at DELETE '/quizzes'"""
+        res = self.client().delete('/quizzes')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, METHOD_NOT_ALLOWED)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], METHOD_NOT_ALLOWED_MSG)
 
 
 # Make the tests conveniently executable

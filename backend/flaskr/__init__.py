@@ -53,22 +53,9 @@ def create_app(test_config=None):
     page = request.args.get('page', 1, type=int)
     start = (page -1) * QUESTIONS_PER_PAGE
     end = start + QUESTIONS_PER_PAGE
-    formatted_questions = format_questions(question_selection)
+    formatted_questions = [question.format() for question in question_selection]
     return formatted_questions[start:end]
   
-
-  def format_questions(question_selection):
-    '''
-    Returns a fomatted selection of trivia questions
-        Parameters:
-                 question_selection: a selection of questions from the trivia question db
-
-        Returns:
-                formatted_questions: An array of formated trivia questions
-    '''
-    formatted_questions = [question.format() for question in question_selection]
-    return formatted_questions
-
 
   def get_formatted_categories():
     '''
@@ -165,8 +152,8 @@ def create_app(test_config=None):
         new_question = Question(
           question=body.get('question', None),
           answer=body.get('answer', None),
-          difficulty=body.get('difficulty', None),
-          category=body.get('category', None)
+          difficulty=int(body.get('difficulty', None)),#int
+          category=body.get('category', None)#string
         )
         # don't add duplicate questions
         duplicate_question = Question.query.filter_by(question=body.get('question')).one_or_none()
