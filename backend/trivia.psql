@@ -125,8 +125,8 @@ COPY public.categories (id, type) FROM stdin;
 
 COPY public.questions (id, question, answer, difficulty, category) FROM stdin;
 2	What movie earned Tom Hanks his third straight Oscar nomination, in 1996?	Apollo 13	4	5
-5	Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?	Maya Angelou	2	4
 4	What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?	Tom Cruise	4	5
+5	Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?	Maya Angelou	2	4
 6	What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?	Edward Scissorhands	3	5
 9	What boxer's original name is Cassius Clay?	Muhammad Ali	1	4
 10	Which is the only team to play in every soccer World Cup tournament?	Brazil	3	6
@@ -174,7 +174,7 @@ SELECT pg_catalog.setval('public.categories_id_seq', 6, true);
 -- Name: questions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: student
 --
 
-SELECT pg_catalog.setval('public.questions_id_seq', 23, true);
+SELECT pg_catalog.setval('public.questions_id_seq', 40, true);
 
 
 --

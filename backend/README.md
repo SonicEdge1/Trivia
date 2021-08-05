@@ -27,6 +27,8 @@ With Postgres running, restore a database using the trivia.psql file provided. F
 ```bash
 psql trivia < trivia.psql
 ```
+### Environment Variables
+Environment variables will need to be set up to match the variables in the .env file located in the main project folder.
 
 ### Running the server
 

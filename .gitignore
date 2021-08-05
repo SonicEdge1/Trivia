@@ -4,3 +4,5 @@ env/
 backend/__pycache__/
 backend/flaskr/__pycache__/
 frontend/node_modules/
+backend/flaskr/__init__ copy.py
+backend/trivia-original.psql
